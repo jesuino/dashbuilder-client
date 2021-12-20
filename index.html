@@ -13,8 +13,7 @@
     </style>
   </head>
   <body>
-    <div id="editor">
-      {
+    <div id="editor">{
         "datasets": [{
           "uuid": "processes",
           "url": "https://raw.githubusercontent.com/jesuino/dashbuilder-data/master/sample_external_datasets/process_dashboard.json"
@@ -63,8 +62,7 @@
             }]
           }]
         }]
-      }
-    </div>
+      }</div>
 
     <script src="ace/ace.js" type="text/javascript" charset="utf-8"></script>
     <script
@@ -109,8 +107,10 @@
         height="100%"
         src="dashbuilder-runtime-client/index.html?standalone&perspective=client.json"
         frameborder="0"
-      />
+      ></iframe>
+    </div>
+    <div style="position: absolute; top: 0; left: 50%; ">
+      <strong>Use <em>Ctrl + ENTER</em> to update</strong>
     </div>
   </body>
-  <html></html>
 </html>
