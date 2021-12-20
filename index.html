@@ -14,55 +14,46 @@
   </head>
   <body>
     <div id="editor">{
-        "datasets": [{
-          "uuid": "processes",
-          "url": "https://raw.githubusercontent.com/jesuino/dashbuilder-data/master/sample_external_datasets/process_dashboard.json"
-        }],
-        "layoutTemplates": [{
-          "name": "Escolas",
-          "rows": [{
-            "layoutColumns": [{
-              "rows": [{
-                "layoutColumns": [{
-                  "layoutComponents": [{
-                    "dragTypeName": "org.dashbuilder.client.editor.BarChartDragComponent",
-                    "settings": {
-                      "type": "BARCHART",
-                      "subtype": "COLUMN",
-                      "chart": {
-                        "width": "800",
-                        "height": "600",
-                        "margin": {
-                          "bottom": "40",
-                          "left": "100",
-                          "right": "50"
-                        }
+  "datasets": [{
+    "uuid": "processes",
+    "url": "https://raw.githubusercontent.com/jesuino/dashbuilder-data/master/sample_external_datasets/process_dashboard.json"
+  }],
+  "layoutTemplates": [{
+    "rows": [{
+      "layoutColumns": [{
+        "rows": [{
+          "layoutColumns": [{
+            "layoutComponents": [{
+              "dragTypeName": "org.dashbuilder.client.editor.BarChartDragComponent",
+              "settings": {
+                "type": "BARCHART",
+                "subtype": "COLUMN",
+                "dataSetLookup": {
+                  "dataSetUuid": "processes",
+                  "groupOps": [{
+                    "columnGroup": {
+                      "source": "USER_IDENTITY",
+                      "groupStrategy": "DYNAMIC"
+                    },
+                    "groupFunctions": [{
+                        "source": "USER_IDENTITY",
                       },
-                      "dataSetLookup": {
-                        "dataSetUuid": "processes",
-                        "groupOps": [{
-                          "columnGroup": {
-                            "source": "USER_IDENTITY",
-                            "groupStrategy": "DYNAMIC"
-                          },
-                          "groupFunctions": [{
-                              "source": "USER_IDENTITY",
-                            },
-                            {
-                              "source": "PROCESSINSTANCEID",
-                              "function": "COUNT"
-                            }
-                          ]
-                        }]
+                      {
+                        "source": "PROCESSINSTANCEID",
+                        "function": "COUNT"
                       }
-                    }
+                    ]
                   }]
-                }]
-              }]
+                }
+              }
             }]
           }]
         }]
-      }</div>
+      }]
+    }]
+  }]
+}
+    </div>
 
     <script src="ace/ace.js" type="text/javascript" charset="utf-8"></script>
     <script
@@ -109,8 +100,8 @@
         frameborder="0"
       ></iframe>
     </div>
-    <div style="position: absolute; top: 0; left: 50%; ">
-      <strong>Use <em>Ctrl + ENTER</em> to update</strong>
+    <div style="position: absolute; top: 0; left: 50%; background-color: lightblue; opacity:0.8">
+      <button onclick="send()"><strong>UPDATE</strong></button>
     </div>
   </body>
 </html>
