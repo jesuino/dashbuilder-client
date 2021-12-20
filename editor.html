@@ -1,0 +1,116 @@
+<html>
+  <head>
+    <style type="text/css" media="screen">
+      #editor {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        width: 50%;
+        float: left;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="editor">
+      {
+        "datasets": [{
+          "uuid": "processes",
+          "url": "https://raw.githubusercontent.com/jesuino/dashbuilder-data/master/sample_external_datasets/process_dashboard.json"
+        }],
+        "layoutTemplates": [{
+          "name": "Escolas",
+          "rows": [{
+            "layoutColumns": [{
+              "rows": [{
+                "layoutColumns": [{
+                  "layoutComponents": [{
+                    "dragTypeName": "org.dashbuilder.client.editor.BarChartDragComponent",
+                    "settings": {
+                      "type": "BARCHART",
+                      "subtype": "COLUMN",
+                      "chart": {
+                        "width": "800",
+                        "height": "600",
+                        "margin": {
+                          "bottom": "40",
+                          "left": "100",
+                          "right": "50"
+                        }
+                      },
+                      "dataSetLookup": {
+                        "dataSetUuid": "processes",
+                        "groupOps": [{
+                          "columnGroup": {
+                            "source": "USER_IDENTITY",
+                            "groupStrategy": "DYNAMIC"
+                          },
+                          "groupFunctions": [{
+                              "source": "USER_IDENTITY",
+                            },
+                            {
+                              "source": "PROCESSINSTANCEID",
+                              "function": "COUNT"
+                            }
+                          ]
+                        }]
+                      }
+                    }
+                  }]
+                }]
+              }]
+            }]
+          }]
+        }]
+      }
+    </div>
+
+    <script src="ace/ace.js" type="text/javascript" charset="utf-8"></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.7.5/beautify.min.js"
+      integrity="sha256-z3YWAUWq4ZqhJwjqxdTFwmXUOkEPpQUpdxWHCZVADA4="
+      crossorigin="anonymous"
+    ></script>
+
+    <script>
+      var editor = ace.edit("editor");
+      editor.session.setMode("ace/mode/javascript");
+
+      const send = () => {
+        var dbFrame = document.getElementById("dbFrame");
+        dbFrame.contentWindow.postMessage(editor.getValue(), null);
+      };
+
+      const onkey = (e) => {
+        if (e.ctrlKey && e.code === "Enter") {
+          send();
+        }
+
+        if (e.ctrlKey && e.shiftKey && e.key === "F") {
+          editor.getSession().setValue(
+            js_beautify(editor.getValue(), {
+              indent_size: 2,
+            })
+          );
+        }
+      };
+
+      window.addEventListener("message", e => {
+        send();
+      });
+
+      document.getElementById("editor").onkeydown = (e) => onkey(e);
+    </script>
+    <div id="db" style="width: 50%; float: right; height: 100%;">
+      <iframe
+        id="dbFrame"
+        width="100%"
+        height="100%"
+        src="dashbuilder-runtime-client/index.html?standalone&perspective=client.json"
+        frameborder="0"
+      />
+    </div>
+  </body>
+  <html></html>
+</html>
