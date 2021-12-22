@@ -10,6 +10,15 @@
         width: 50%;
         float: left;
       }
+
+      #langSelector {
+        background-color: lightblue;
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        z-index: 10;
+        margin-left: 10px;
+      }
     </style>
   </head>
   <body>
@@ -36,7 +45,7 @@
                       "groupStrategy": "DYNAMIC"
                     },
                     "groupFunctions": [{
-                        "source": "USER_IDENTITY",
+                        "source": "USER_IDENTITY"
                       },
                       {
                         "source": "PROCESSINSTANCEID",
@@ -52,7 +61,13 @@
       }]
     }]
   }]
-}
+}</div>
+
+    <div id="langSelector">
+      <form id="langSelectorForm">
+        <input type="radio" name="lang" value="js" checked />Javascript
+        <input type="radio" name="lang" value="yaml" />YAML
+      </form>
     </div>
 
     <script src="ace/ace.js" type="text/javascript" charset="utf-8"></script>
@@ -61,14 +76,47 @@
       integrity="sha256-z3YWAUWq4ZqhJwjqxdTFwmXUOkEPpQUpdxWHCZVADA4="
       crossorigin="anonymous"
     ></script>
-
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"
+      integrity="sha512-CSBhVREyzHAjAFfBlIBakjoRUKp5h7VSweP0InR/pAJyptH7peuhCsqAI/snV+TwZmXZqoUklpXp6R6wMnYf5Q=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
     <script>
-      var editor = ace.edit("editor");
+      const editor = ace.edit("editor");
       editor.session.setMode("ace/mode/javascript");
 
+      document.selectedLang = () => {
+        return document.querySelector(
+          'input[name="lang"]:checked'
+        ).value;
+      }
+
+
+      const toYaml = value => {
+        var yaml = jsyaml.load(value);
+       return jsyaml.dump(yaml);
+
+      }
+
+      const toJson = value => {
+        var json = jsyaml.load(value);
+       return format(JSON.stringify(json))
+
+      }
+      const format = json => {
+            return js_beautify(json, {
+              indent_size: 2,
+            });
+      }
       const send = () => {
+        var value  = editor.getValue();
+
+        if (document.selectedLang() === "yaml") {
+          value = toJson(value);
+        }
         var dbFrame = document.getElementById("dbFrame");
-        dbFrame.contentWindow.postMessage(editor.getValue(), null);
+        dbFrame.contentWindow.postMessage(value, null);
       };
 
       const onkey = (e) => {
@@ -77,21 +125,30 @@
         }
 
         if (e.ctrlKey && e.shiftKey && e.key === "F") {
-          editor.getSession().setValue(
-            js_beautify(editor.getValue(), {
-              indent_size: 2,
-            })
-          );
+          editor.getSession().setValue(format(editor.getValue()));
         }
       };
 
-      window.addEventListener("message", e => {
-        send();
-      });
+      window.addEventListener("message", (e) => send());
 
       document.getElementById("editor").onkeydown = (e) => onkey(e);
+      document.getElementById("langSelectorForm").onchange = (e) => {
+        var selectedLang = document.selectedLang();
+        if (selectedLang === "yaml") {
+          var js = editor.getValue();
+          var yaml = jsyaml.load(js);
+          editor.getSession().setMode("ace/mode/yaml")
+          editor.getSession().setValue(toYaml(js));
+
+
+        } else if (selectedLang === "js") {
+          var yaml = editor.getValue();
+          editor.getSession().setMode("ace/mode/javascript");
+          editor.getSession().setValue(toJson(yaml));
+        }
+      };
     </script>
-    <div id="db" style="width: 50%; float: right; height: 100%;">
+    <div id="db" style="width: 50%; float: right; height: 100%">
       <iframe
         id="dbFrame"
         width="100%"
@@ -100,7 +157,15 @@
         frameborder="0"
       ></iframe>
     </div>
-    <div style="position: absolute; top: 0; left: 50%; background-color: lightblue; opacity:0.8">
+    <div
+      style="
+        position: absolute;
+        top: 0;
+        left: 50%;
+        background-color: lightblue;
+        opacity: 0.8;
+      "
+    >
       <button onclick="send()"><strong>UPDATE</strong></button>
     </div>
   </body>
