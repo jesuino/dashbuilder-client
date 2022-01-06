@@ -24,7 +24,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Event;
 import javax.inject.Inject;
 
-import org.dashbuilder.client.external.ExternalDataSetRegister;
+import org.dashbuilder.client.external.ExternalDataSetClientProvider;
 import org.dashbuilder.client.navigation.NavigationManager;
 import org.dashbuilder.client.parser.RuntimeModelClientParserFactory;
 import org.dashbuilder.client.perspective.generator.RuntimePerspectiveGenerator;
@@ -59,7 +59,7 @@ public class RuntimeClientLoader {
 
     BusyIndicatorView loading;
 
-    ExternalDataSetRegister externalDataSetRegister;
+    ExternalDataSetClientProvider externalDataSetRegister;
 
     RuntimeModelClientParserFactory parserFactory;
 
@@ -79,7 +79,7 @@ public class RuntimeClientLoader {
                                RuntimePerspectivePluginManager runtimePerspectivePluginManager,
                                NavigationManager navigationManager,
                                BusyIndicatorView loading,
-                               ExternalDataSetRegister externalDataSetRegister,
+                               ExternalDataSetClientProvider externalDataSetRegister,
                                RuntimeModelClientParserFactory parserFactory,
                                RuntimeModelContentListener contentListener,
                                Event<UpdatedRuntimeModelEvent> updatedRuntimeModelEvent) {
@@ -103,8 +103,8 @@ public class RuntimeClientLoader {
             loading.hideBusyIndicator();
 
             if (response.getRuntimeModelOp().isPresent()) {
-                responseConsumer.accept(response);
                 this.registerModel(response.getRuntimeModelOp().get());
+                responseConsumer.accept(response);
             } else if (importID != null && !importID.trim().isEmpty()) {
                 this.loadModel(model -> {
                     this.registerModel(model);
@@ -113,18 +113,12 @@ public class RuntimeClientLoader {
                             response.getAvailableModels(),
                             response.isAllowUpload());
                     responseConsumer.accept(newResponse);
-                }, () -> {
-                    responseConsumer.accept(response);
-                }, (e, t) -> {
-                    handleError(error, e, t);
-                });
+                }, () -> responseConsumer.accept(response), (e, t) -> handleError(error, e, t));
             } else {
                 responseConsumer.accept(response);
             }
 
-        }, (msg, t) -> {
-            handleError(error, msg, t);
-        });
+        }, (msg, t) -> handleError(error, msg, t));
     }
 
     public void loadModel(Consumer<RuntimeModel> modelLoaded,
@@ -158,16 +152,12 @@ public class RuntimeClientLoader {
     }
 
     public void clientLoad(String fileName, String content) {
-        var parserOp = parserFactory.get(fileName);
-
-        if (parserOp.isPresent()) {
-            var runtimeModel = parserOp.get().parse(content);
-            registerModel(runtimeModel);
-            runtimeModelResourceClient.setClientModel(runtimeModel);
-            updatedRuntimeModelEvent.fire(new UpdatedRuntimeModelEvent(CLIENT_MODEL_ID));
-            return;
-        }
-        throw new IllegalArgumentException("File type is not supported");
+        var parser = parserFactory.get(fileName)
+                .orElseThrow(() -> new IllegalArgumentException("File type is not supported"));
+        var runtimeModel = parser.parse(content);
+        registerModel(runtimeModel);
+        runtimeModelResourceClient.setClientModel(runtimeModel);
+        updatedRuntimeModelEvent.fire(new UpdatedRuntimeModelEvent(CLIENT_MODEL_ID));
     }
 
     public boolean isOffline() {

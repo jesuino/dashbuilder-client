@@ -30,7 +30,7 @@ import javax.ws.rs.core.MediaType;
 import org.dashbuilder.client.error.DefaultRuntimeErrorCallback;
 import org.dashbuilder.client.error.DefaultRuntimeErrorCallback.DefaultErrorType;
 import org.dashbuilder.client.error.ErrorResponseVerifier;
-import org.dashbuilder.client.external.ExternalDataSetRegister;
+import org.dashbuilder.client.external.ExternalDataSetClientProvider;
 import org.dashbuilder.client.marshalling.ClientDataSetMetadataJSONMarshaller;
 import org.dashbuilder.common.client.error.ClientRuntimeError;
 import org.dashbuilder.dataprovider.DataSetProviderType;
@@ -75,7 +75,7 @@ public class RuntimeDataSetClientServices implements DataSetClientServices {
     ClientDataSetManager clientDataSetManager;
 
     @Inject
-    ExternalDataSetRegister externalDataSetRegister;
+    ExternalDataSetClientProvider externalDataSetClientProvider;
 
     Map<String, DataSetMetadata> metadataCache = new HashMap<>();
 
@@ -141,7 +141,7 @@ public class RuntimeDataSetClientServices implements DataSetClientServices {
             return;
         }
 
-        externalDataSetRegister.fetchAndRegister(lookup.getDataSetUUID(),
+        externalDataSetClientProvider.fetchAndRegister(lookup.getDataSetUUID(),
                 lookup,
                 new DataSetReadyCallback() {
 
