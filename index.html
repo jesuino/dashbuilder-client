@@ -1,13 +1,11 @@
 <html>
   <head>
     <style type="text/css" media="screen">
-
       #editorContainer {
         position: relative;
         float: left;
         width: 40%;
         height: 100vh;
-
       }
       #editor {
         position: absolute;
@@ -18,15 +16,14 @@
         width: 100%;
         height: 100%;
         float: left;
-
       }
-      #db {
-        width: 60%; 
-        float: right; 
+      #dbContainer {
+        width: 60%;
+        float: right;
         height: 100vh;
       }
       #toolbarContainer {
-        position: absolute;                
+        position: absolute;
         left: 0;
         bottom: 10;
         background-color: lightblue;
@@ -38,12 +35,9 @@
   <body>
     <div id="editorContainer">
       <div id="editor"></div>
-      <div id="toolbarContainer">
-        <button onclick="send()"><strong>UPDATE</strong></button>
-      </div>
     </div>
-    
-    <div id="db">
+
+    <div id="dbContainer">
       <iframe
         id="dbFrame"
         width="100%"
@@ -60,6 +54,13 @@
       crossorigin="anonymous"
       referrerpolicy="no-referrer"
     ></script>
+
+
+    <div id="toolbarContainer">
+      <button id="updateBtn"><strong>UPDATE</strong></button>
+      <button id="hideEditorBtn"><strong>PREVIEW</strong></button>
+    </div>
     <script src="index.js"></script>
+
   </body>
 </html>
