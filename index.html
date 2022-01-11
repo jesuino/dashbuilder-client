@@ -30,6 +30,24 @@
         opacity: 0.8;
         z-index: 10;
       }
+
+      #autoBtnContainer input[type="checkbox"] {
+        display: none;
+      }
+
+      #autoBtnContainer span {
+        border-radius: 3px;
+        color: blue;
+      }
+
+      #autoBtnContainer input[type="checkbox"]:checked + span {
+        background-color: blue;
+        color: lightblue;
+      }
+
+      #editorControls {
+        display: inline-block;
+      }
     </style>
   </head>
   <body>
@@ -55,12 +73,15 @@
       referrerpolicy="no-referrer"
     ></script>
 
-
     <div id="toolbarContainer">
-      <button id="updateBtn"><strong>UPDATE</strong></button>
+      <div id="editorControls">
+        <label id="autoBtnContainer"
+          ><input type="checkbox" id="autoBtn" /><span>AUTO</span></label
+        >
+        <button id="updateBtn"><strong>UPDATE</strong></button>
+      </div>
       <button id="hideEditorBtn"><strong>PREVIEW</strong></button>
     </div>
     <script src="index.js"></script>
-
   </body>
 </html>

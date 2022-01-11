@@ -41,7 +41,9 @@ var currentValue = "";
 var hideEditor = false;
 const editorEl = document.getElementById("editor");
 const updateBtn = document.getElementById("updateBtn");
+const autoBtn = document.getElementById("autoBtn");
 const hideEditorBtn = document.getElementById("hideEditorBtn");
+const editorControls = document.getElementById("editorControls");
 const editorContainer = document.getElementById("editorContainer");
 const dbContainer = document.getElementById("dbContainer");
 const editor = ace.edit("editor");
@@ -76,10 +78,12 @@ const hideShowEditor = (e) => {
         editorContainer.style.width = "0%";
         dbContainer.style.width = "100%";
         hideEditorBtn.textContent = "EDIT";
+        editorControls.style.display = 'none';
     } else {
         editorContainer.style.width = "40%";
         dbContainer.style.width = "60%";
         hideEditorBtn.textContent = "PREVIEW";
+        editorControls.style.display = 'inline-block';
     }
     editor.renderer.updateFull();
 };
@@ -93,7 +97,7 @@ hideEditorBtn.onclick = hideShowEditor;
 updateBtn.onclick = (e) => send();
 editorEl.onkeydown = (e) => onkey(e);
 setInterval(() => {
-  if (currentValue !== editor.getValue()) {
+  if (autoBtn.checked && currentValue !== editor.getValue()) {
     currentValue = editor.getValue();
     send();
   }
