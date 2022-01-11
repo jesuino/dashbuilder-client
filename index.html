@@ -1,181 +1,49 @@
 <html>
   <head>
     <style type="text/css" media="screen">
+
+      #editorContainer {
+        position: relative;
+        float: left;
+        width: 40%;
+        height: 100vh;
+
+      }
       #editor {
         position: absolute;
         top: 0;
         right: 0;
         bottom: 0;
         left: 0;
-        width: 50%;
+        width: 100%;
+        height: 100%;
         float: left;
-      }
 
-      #langSelector {
-        background-color: lightblue;
-        position: absolute;
+      }
+      #db {
+        width: 60%; 
+        float: right; 
+        height: 100vh;
+      }
+      #toolbarContainer {
+        position: absolute;                
         left: 0;
-        bottom: 0;
+        bottom: 10;
+        background-color: lightblue;
+        opacity: 0.8;
         z-index: 10;
-        margin-left: 10px;
       }
     </style>
   </head>
   <body>
-    <div id="editor">{
-  "datasets": [{
-    "uuid": "pop",
-    "url": "/datasets/population.json"
-  }],
-  "layoutTemplates": [{
-    "name": "Countries Population",
-    "rows": [{
-      "layoutColumns": [{
-        "layoutComponents": [{
-          "type": "HTML",
-          "properties": {
-            "HTML_CODE": "Countries Population",
-            "font-size": "xx-large"
-          }
-        }, {
-          "settings": {
-            "type": "BARCHART",
-            "subtype": "COLUMN",
-            "chart": {
-              "width": "800",
-              "margin": {
-                "left": "100"
-              }
-            },
-            "dataSetLookup": {
-              "dataSetUuid": "pop",
-              "rowCount": 10,
-              "groupOps": [{
-                "columnGroup": {
-                  "source": "Name",
-                  "groupStrategy": "DYNAMIC"
-                },
-                "groupFunctions": [{
-                  "source": "Name"
-                }, {
-                  "source": "2020 Population",
-                  "function": "MAX"
-                }, {
-                  "source": "2021 Population",
-                  "function": "MAX"
-                }]
-              }]
-            }
-          }
-        }, {
-          "settings": {
-            "type": "TABLE",
-            "chart": {
-              "resizable": "true"
-            },
-            "table": {
-              "sort": {
-                "enabled": "true"
-              }
-            },
-            "dataSetLookup": {
-              "dataSetUuid": "pop"
-            }
-          }
-        }]
-      }]
-    }]
-  }]
-}</div>
-
-    <div id="langSelector">
-      <form id="langSelectorForm">
-        <input type="radio" name="lang" value="js" checked />JSON
-        <input type="radio" name="lang" value="yaml" />YAML
-      </form>
+    <div id="editorContainer">
+      <div id="editor"></div>
+      <div id="toolbarContainer">
+        <button onclick="send()"><strong>UPDATE</strong></button>
+      </div>
     </div>
-
-    <script src="ace/ace.js" type="text/javascript" charset="utf-8"></script>
-    <script
-      src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.7.5/beautify.min.js"
-      integrity="sha256-z3YWAUWq4ZqhJwjqxdTFwmXUOkEPpQUpdxWHCZVADA4="
-      crossorigin="anonymous"
-    ></script>
-    <script
-      src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"
-      integrity="sha512-CSBhVREyzHAjAFfBlIBakjoRUKp5h7VSweP0InR/pAJyptH7peuhCsqAI/snV+TwZmXZqoUklpXp6R6wMnYf5Q=="
-      crossorigin="anonymous"
-      referrerpolicy="no-referrer"
-    ></script>
-    <script>      
-      const editorEl = document.getElementById("editor");
-      const editor = ace.edit("editor");
-      editor.session.setMode("ace/mode/javascript");
-
-      document.selectedLang = () => {
-        return document.querySelector(
-          'input[name="lang"]:checked'
-        ).value;
-      }
-
-      const toYaml = value => {
-        var yaml = jsyaml.load(value);
-       return jsyaml.dump(yaml);
-      }
-
-      const toJson = value => {
-        var json = jsyaml.load(value);
-       return format(JSON.stringify(json))
-
-      }
-      const format = json => {
-            return js_beautify(json, {
-              indent_size: 2,
-            });
-      }
-      const send = () => {
-        var value  = editor.getValue();
-
-        if (document.selectedLang() === "yaml") {
-          value = toJson(value);
-        }
-        document.getElementById("dbFrame").contentWindow.postMessage(value, null);
-      };
-
-      const onkey = (e) => {
-        if (e.ctrlKey && e.code === "Enter") {
-          send();
-        }
-
-        if (e.ctrlKey && e.shiftKey && e.key === "F") {
-          editor.getSession().setValue(format(editor.getValue()));
-        }
-      };
-
-      window.addEventListener("message", (e) => {
-        if (e.data === "ready") {
-          send();
-        }
-      });
-
-      editorEl.onkeydown = (e) => onkey(e);
-      document.getElementById("langSelectorForm").onchange = (e) => {
-        var selectedLang = document.selectedLang();
-        if (selectedLang === "yaml") {
-          var js = editor.getValue();
-          var yaml = jsyaml.load(js);
-          editor.getSession().setMode("ace/mode/yaml")
-          editor.getSession().setValue(toYaml(js));
-
-
-        } else if (selectedLang === "js") {
-          var yaml = editor.getValue();
-          editor.getSession().setMode("ace/mode/javascript");
-          editor.getSession().setValue(toJson(yaml));
-        }
-      };
-    </script>
-    <div id="db" style="width: 50%; float: right; height: 100%">
+    
+    <div id="db">
       <iframe
         id="dbFrame"
         width="100%"
@@ -184,16 +52,14 @@
         frameborder="0"
       ></iframe>
     </div>
-    <div
-      style="
-        position: absolute;
-        top: 0;
-        left: 50%;
-        background-color: lightblue;
-        opacity: 0.8;
-      "
-    >
-      <button onclick="send()"><strong>UPDATE</strong></button>
-    </div>
+
+    <script src="ace/ace.js" type="text/javascript" charset="utf-8"></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"
+      integrity="sha512-CSBhVREyzHAjAFfBlIBakjoRUKp5h7VSweP0InR/pAJyptH7peuhCsqAI/snV+TwZmXZqoUklpXp6R6wMnYf5Q=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+    <script src="index.js"></script>
   </body>
 </html>
