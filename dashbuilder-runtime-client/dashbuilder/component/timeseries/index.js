@@ -10,11 +10,6 @@ option = {
   title: {
     left: "center",
   },
-  toolbox: {
-    feature: {
-      saveAsImage: {}
-    },
-  },
   xAxis: {
     type: "time",
     boundaryGap: false,
@@ -72,45 +67,61 @@ const datasetToSeries = (dataset) => {
   return series;
 };
 
-const fillProperties = (props) => {
-  let option = {
-    title: {
-      left: props.get("title_align") || "center",
-      text: props.get("title") || "",
-    },
-  };
-
-  if (props.get("zoom") === "true") {
-    option.dataZoom = [
-      {
-        type: "inside",
-      },
-      {
-        start: 0,
-        end: 20,
-      },
-    ];
-  } else {
-    option.dataZoom = [];
+const setPropertyOnObject = (prop, value, obj) => {
+  if (!prop || !value) {
+    return obj;
   }
+  const props = prop.split(".");
+  let parent = obj;
+  for (let i = 0; i < props.length; i++) {
+    let name = props[i];
+    if (i === props.length - 1) {
+      parent[name] = value;
+    } else {
+      parent[name] = parent[name] || {};
+      parent = parent[name];
+    }
+  }
+  return obj;
+};
 
+const fillProperties = (props) => {
+  var option = {};
+  const optionStr = props.get("option");
+  if (optionStr) {
+    try {
+      option = JSON.parse(optionStr);
+    } catch (e) {
+      console.log('Not able to parse option property')
+      option = {};
+    }
+    props.delete("option");
+  }
+  props.forEach((value, key) => {
+    if (key !== "dataSet") {
+      setPropertyOnObject(key, value, option);
+    }
+  });
+  console.debug(option);
   return option;
 };
 
 window.addEventListener("message", (e) => {
   const props = e.data.properties;
   const dataset = props ? props.get("dataSet") : null;
-
   if (props) {
     const option = fillProperties(props);
-    chartContainer.setOption(option);
+    if (option) {
+      chartContainer.setOption(option);
+    }
   }
-
   if (dataset) {
     const validation = validate(dataset.columns);
     if (validation) {
+        // TODO: Handle validation
     } else {
       chartContainer.setOption({ series: datasetToSeries(dataset) });
     }
   }
+
 });
