@@ -62,6 +62,7 @@ const send = () => {
   currentValue = value;
   if (value.trim() !== "") {
     value = toJson(value);
+    console.debug(value);
     document.getElementById("dbFrame").contentWindow.postMessage(value, null);
   }
 };

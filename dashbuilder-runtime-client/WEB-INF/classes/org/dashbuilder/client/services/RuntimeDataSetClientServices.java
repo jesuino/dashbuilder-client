@@ -27,6 +27,7 @@ import javax.inject.Inject;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 
+import org.dashbuilder.client.RuntimeClientLoader;
 import org.dashbuilder.client.error.DefaultRuntimeErrorCallback;
 import org.dashbuilder.client.error.DefaultRuntimeErrorCallback.DefaultErrorType;
 import org.dashbuilder.client.error.ErrorResponseVerifier;
@@ -73,6 +74,9 @@ public class RuntimeDataSetClientServices implements DataSetClientServices {
 
     @Inject
     ClientDataSetManager clientDataSetManager;
+    
+    @Inject
+    RuntimeClientLoader loader;
 
     @Inject
     ExternalDataSetClientProvider externalDataSetClientProvider;
@@ -134,7 +138,6 @@ public class RuntimeDataSetClientServices implements DataSetClientServices {
 
     @Override
     public void lookupDataSet(DataSetDef def, DataSetLookup lookup, DataSetReadyCallback listener) throws Exception {
-
         var clientDataSet = clientDataSetManager.lookupDataSet(lookup);
         if (clientDataSet != null) {
             listener.callback(clientDataSet);
@@ -147,8 +150,12 @@ public class RuntimeDataSetClientServices implements DataSetClientServices {
 
                     @Override
                     public boolean onError(ClientRuntimeError error) {
-                        DomGlobal.console.log("Error retrieving dataset from client, trying from backend");
-                        backendLookup(def, lookup, listener);
+                        if (loader.isOffline()) {
+                            listener.onError(error);
+                        } else {
+                            DomGlobal.console.debug("Error retrieving dataset from client, trying from backend");
+                            backendLookup(def, lookup, listener);
+                        }
                         return false;
                     }
 
