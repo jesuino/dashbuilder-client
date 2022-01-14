@@ -38,11 +38,17 @@ layoutTemplates:
                   dataSetLookup:
                     dataSetUuid: pop`;
 var currentValue = "";
-var hideEditor = false;
 const editorEl = document.getElementById("editor");
 const updateBtn = document.getElementById("updateBtn");
 const autoBtn = document.getElementById("autoBtn");
-const hideEditorBtn = document.getElementById("hideEditorBtn");
+
+const showEditorBtn = document.getElementById("showEditorBtn");
+const showPreviewBtn = document.getElementById("showPreviewBtn");
+
+const IMPORT_PARAM = "import";
+const PREVIEW_PARAM = "preview";
+const EDITOR_PARAM = "editor";
+
 const editorControls = document.getElementById("editorControls");
 const editorContainer = document.getElementById("editorContainer");
 const dbContainer = document.getElementById("dbContainer");
@@ -73,20 +79,42 @@ const onkey = (e) => {
   }
 };
 
-const hideShowEditor = (e) => {
-    hideEditor = !hideEditor;
-    if (hideEditor) {
-        editorContainer.style.width = "0%";
-        dbContainer.style.width = "100%";
-        hideEditorBtn.textContent = "EDIT";
-        editorControls.style.display = 'none';
-    } else {
-        editorContainer.style.width = "40%";
-        dbContainer.style.width = "60%";
-        hideEditorBtn.textContent = "PREVIEW";
-        editorControls.style.display = 'inline-block';
-    }
-    editor.renderer.updateFull();
+
+const onShowEditor = e => {
+  if (!showPreviewBtn.checked && !showEditorBtn.checked) {
+    showEditorBtn.checked = true;
+  }
+  hideShow()
+}
+
+const onShowPreview = e => {
+  if (!showPreviewBtn.checked && !showEditorBtn.checked) {
+    showPreviewBtn.checked = true;
+  }
+  hideShow()
+}
+
+const hideShow = (e) => {
+
+  if (showEditorBtn.checked) {
+    editorContainer.style.width = "100%";
+    editorControls.style.display = "inline-block";
+  } else {
+    editorContainer.style.width = "0%";
+    editorControls.style.display = "none";
+  }
+
+  if (showPreviewBtn.checked) {
+    dbContainer.style.width = "100%";
+  } else {
+    dbContainer.style.width = "0%";
+  }
+
+  urlParams.set(PREVIEW_PARAM, showPreviewBtn.checked);
+  urlParams.set(EDITOR_PARAM, showEditorBtn.checked);
+
+  window.location.hash = `${EDITOR_PARAM}=${showEditorBtn.checked}&${PREVIEW_PARAM}=${showPreviewBtn.checked}`;
+  editor.renderer.updateFull();
 };
 
 window.addEventListener("message", (e) => {
@@ -94,20 +122,24 @@ window.addEventListener("message", (e) => {
     send();
   }
 });
-hideEditorBtn.onclick = hideShowEditor;
+
+showEditorBtn.onclick = onShowEditor;
+showPreviewBtn.onclick = onShowPreview;
 updateBtn.onclick = (e) => send();
-editorEl.onkeydown = (e) => onkey(e);
-setInterval(() => {
-  if (autoBtn.checked && currentValue !== editor.getValue()) {
-    currentValue = editor.getValue();
-    send();
-  }
-}, 2000);
+editorEl.onkeydown = onkey;
 
-const urlParams = new URLSearchParams(window.location.search);
-const importUrl = urlParams.get("import");
-const preview = urlParams.get("preview");
+const urlParams = new URLSearchParams(window.location.hash.replace(/#/, "?"));
+const showEditorParam = urlParams.get(EDITOR_PARAM);
+const showPreviewParam = urlParams.get(PREVIEW_PARAM);
+if (showEditorParam) {
+  showEditorBtn.checked = showEditorParam !== "false";
+}
+if (showPreviewParam) {
+  showPreviewParam.checked = showPreviewParam !== "false";
+}
+hideShow();
 
+const importUrl = urlParams.get(IMPORT_PARAM);
 if (importUrl) {
   fetch(importUrl, (r) => r.text())
     .then((data) => data.text().then((v) => editor.session.setValue(v)))
@@ -115,7 +147,9 @@ if (importUrl) {
 } else {
   editor.session.setValue(defaultYML);
 }
-
-if (preview) {
-  hideShowEditor();
-}
+setInterval(() => {
+  if (autoBtn.checked && currentValue !== editor.getValue()) {
+    currentValue = editor.getValue();
+    send();
+  }
+}, 2000);
