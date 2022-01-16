@@ -60,12 +60,14 @@
         position: absolute;
         z-index: 10;
         bottom: 20;
-        left: 95%;
+        left: 45%;
       }
 
       #updateBtn {
         color: blue;
-        font-size: xx-large
+        font-size: xxx-large;
+        text-align: center;
+        line-height: 65px;
       }
     </style>
   </head>
@@ -73,13 +75,6 @@
     <div class="appContainer">
       <div id="editorContainer">
         <div id="editor"></div>
-        <div id="editorControls">
-          <button id="updateBtn">&#9658</button>
-
-          <label class="pushButton" style="display:none"
-            ><input type="checkbox" id="autoBtn" /><span>AUTO</span></label
-          >
-        </div>
       </div>
 
       <div id="dbContainer">
@@ -90,6 +85,14 @@
           src="dashbuilder-runtime-client/"
           frameborder="0"
         ></iframe>
+      </div>
+
+      <div id="editorControls">
+        <button id="updateBtn">&#9658</button>
+
+        <label class="pushButton" style="display:none"
+          ><input type="checkbox" id="autoBtn" /><span>AUTO</span></label
+        >
       </div>
     </div>
 

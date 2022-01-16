@@ -110,8 +110,8 @@ const hideShow = (e) => {
     dbContainer.style.width = "0%";
   }
 
-  urlParams.set(PREVIEW_PARAM, showPreviewBtn.checked);
-  urlParams.set(EDITOR_PARAM, showEditorBtn.checked);
+  urlHashParams.set(PREVIEW_PARAM, showPreviewBtn.checked);
+  urlHashParams.set(EDITOR_PARAM, showEditorBtn.checked);
 
   window.location.hash = `${EDITOR_PARAM}=${showEditorBtn.checked}&${PREVIEW_PARAM}=${showPreviewBtn.checked}`;
   editor.renderer.updateFull();
@@ -128,9 +128,9 @@ showPreviewBtn.onclick = onShowPreview;
 updateBtn.onclick = (e) => send();
 editorEl.onkeydown = onkey;
 
-const urlParams = new URLSearchParams(window.location.hash.replace(/#/, "?"));
-const showEditorParam = urlParams.get(EDITOR_PARAM);
-const showPreviewParam = urlParams.get(PREVIEW_PARAM);
+const urlHashParams = new URLSearchParams(window.location.hash.replace(/#/, "?"));
+const showEditorParam = urlHashParams.get(EDITOR_PARAM);
+const showPreviewParam = urlHashParams.get(PREVIEW_PARAM);
 if (showEditorParam) {
   showEditorBtn.checked = showEditorParam !== "false";
 }
@@ -139,7 +139,8 @@ if (showPreviewParam) {
 }
 hideShow();
 
-const importUrl = urlParams.get(IMPORT_PARAM);
+const urlQueryParams = new URLSearchParams(window.location.search);
+const importUrl = urlQueryParams.get(IMPORT_PARAM);
 if (importUrl) {
   fetch(importUrl, (r) => r.text())
     .then((data) => data.text().then((v) => editor.session.setValue(v)))
