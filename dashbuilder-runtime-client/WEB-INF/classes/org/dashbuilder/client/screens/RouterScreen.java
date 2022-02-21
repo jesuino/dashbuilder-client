@@ -25,7 +25,6 @@ import javax.inject.Inject;
 import com.google.gwt.core.client.GWT;
 import elemental2.dom.DomGlobal;
 import elemental2.dom.HTMLElement;
-
 import org.dashbuilder.client.RuntimeClientLoader;
 import org.dashbuilder.client.RuntimeCommunication;
 import org.dashbuilder.client.navbar.AppNavBar;
@@ -102,7 +101,7 @@ public class RouterScreen {
     public void doRoute() {
         clientLoader.load(this::route,
                 (a, t) -> {
-                    runtimeCommunication.showWarning(i18n.errorLoadingBackend(), t);
+                    runtimeCommunication.showSuccess(i18n.clientMode(), t);
                     appNavBar.setClientOnly(true);
                     placeManager.goTo(EmptyPerspective.ID);
                 });
