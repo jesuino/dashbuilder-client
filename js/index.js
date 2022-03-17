@@ -1,42 +1,38 @@
 const defaultYML = `datasets:
-  - uuid: pop
-    url: /datasets/population.json
-layoutTemplates:
-  - name: Countries Population
-    rows:
-      - layoutColumns:
-          - layoutComponents:
-              - type: HTML
-                properties:
-                  HTML_CODE: Countries Population
-                  font-size: xx-large
-              - settings:
-                  type: BARCHART
-                  subtype: COLUMN
-                  chart:
-                    width: '800'
-                    margin:
-                      left: '100'
-                  dataSetLookup:
-                    dataSetUuid: pop
-                    rowCount: 10
-                    groupOps:
-                      - columnGroup:
-                          source: Name
-                          groupStrategy: DYNAMIC
-                        groupFunctions:
-                          - source: Name
-                          - source: 2020 Population
-                          - source: 2021 Population
-              - settings:
-                  type: TABLE
-                  chart:
-                    resizable: 'true'
-                  table:
-                    sort:
-                      enabled: 'true'
-                  dataSetLookup:
-                    dataSetUuid: pop`;
+- uuid: pop
+  url: /datasets/population.json
+pages:
+- name: Countries Population
+  components:
+    - type: HTML
+      properties:
+        HTML_CODE: Countries Population
+        font-size: xx-large
+    - settings:
+        type: BARCHART
+        chart:
+          width: '800'
+          margin:
+            left: '100'
+        dataSetLookup:
+          uuid: pop
+          rowCount: 10
+          group:
+            - columnGroup:
+                source: Name
+              groupFunctions:
+                - source: Name
+                - source: 2020 Population
+                - source: 2021 Population
+    - settings:
+        type: TABLE
+        chart:
+          resizable: 'true'
+        table:
+          sort:
+            enabled: 'true'
+        dataSetLookup:
+          uuid: pop`;
 var currentValue = "";
 const editorEl = document.getElementById("editor");
 const updateBtn = document.getElementById("updateBtn");
