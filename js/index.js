@@ -54,16 +54,10 @@ editor.setOptions({
   fontSize: "12pt",
 });
 
-const toJson = (value) => {
-  var json = jsyaml.load(value);
-  return JSON.stringify(json);
-};
-
 const send = () => {
   var value = editor.getValue();
   currentValue = value;
   if (value.trim() !== "") {
-    value = toJson(value);
     console.debug(value);
     document.getElementById("dbFrame").contentWindow.postMessage(value, null);
   }
