@@ -2,11 +2,9 @@ const defaultYML = `datasets:
 - uuid: pop
   url: /datasets/population.json
 pages:
-- name: Countries Population
-  components:
-    - type: HTML
+- components:
+    - html: Countries Population
       properties:
-        HTML_CODE: Countries Population
         font-size: xx-large
     - settings:
         type: BARCHART
