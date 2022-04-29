@@ -15,6 +15,7 @@
  */
 package org.dashbuilder.client.parser;
 
+import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
@@ -34,6 +35,11 @@ public class YAMLRuntimeModelClientParser implements RuntimeModelClientParser {
     @Inject
     PropertyReplacementService replacementService;
 
+    @PostConstruct
+    public void setup() {
+        JsYamlInjector.ensureJsYamlInjected();
+    }
+
     @Override
     public RuntimeModel parse(String content) {
         var jsonContent = convertToJson(content);
@@ -41,7 +47,7 @@ public class YAMLRuntimeModelClientParser implements RuntimeModelClientParser {
 
         if (properties != null && !properties.isEmpty()) {
             var replacedContent = replacementService.replace(content, properties);
-            jsonContent = convertToJson(replacedContent); 
+            jsonContent = convertToJson(replacedContent);
         }
         return jsonParser.parse(jsonContent);
     }
@@ -59,7 +65,6 @@ public class YAMLRuntimeModelClientParser implements RuntimeModelClientParser {
     }
 
     private String convertToJson(String content) {
-        JsYamlInjector.ensureJsYamlInjected();
         var object = JsYaml.Builder.get().load(content);
         return Global.JSON.stringify(object);
     }
