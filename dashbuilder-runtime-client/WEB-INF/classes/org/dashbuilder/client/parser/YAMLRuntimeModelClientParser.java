@@ -22,6 +22,7 @@ import elemental2.core.Global;
 import elemental2.dom.DomGlobal;
 import org.dashbuilder.client.parser.yaml.JsYaml;
 import org.dashbuilder.client.parser.yaml.JsYamlInjector;
+import org.dashbuilder.shared.marshalling.RuntimeModelJSONMarshaller;
 import org.dashbuilder.shared.model.RuntimeModel;
 
 @ApplicationScoped
@@ -30,10 +31,18 @@ public class YAMLRuntimeModelClientParser implements RuntimeModelClientParser {
     @Inject
     JSONRuntimeModelClientParser jsonParser;
 
+    @Inject
+    PropertyReplacementService replacementService;
+
     @Override
     public RuntimeModel parse(String content) {
-        var object = convertToJson(content);
-        var jsonContent = Global.JSON.stringify(object);
+        var jsonContent = convertToJson(content);
+        var properties = RuntimeModelJSONMarshaller.get().retrieveProperties(jsonContent);
+
+        if (properties != null && !properties.isEmpty()) {
+            var replacedContent = replacementService.replace(content, properties);
+            jsonContent = convertToJson(replacedContent); 
+        }
         return jsonParser.parse(jsonContent);
     }
 
@@ -49,9 +58,9 @@ public class YAMLRuntimeModelClientParser implements RuntimeModelClientParser {
         return false;
     }
 
-    private Object convertToJson(String content) {
+    private String convertToJson(String content) {
         JsYamlInjector.ensureJsYamlInjected();
         var object = JsYaml.Builder.get().load(content);
-        return object;
+        return Global.JSON.stringify(object);
     }
 }
