@@ -23,7 +23,6 @@ pages:
                 - source: 2020 Population
                 - source: 2021 Population
     - settings:
-        type: TABLE
         chart:
           resizable: 'true'
         table:
@@ -131,7 +130,10 @@ const urlQueryParams = new URLSearchParams(window.location.search);
 const importUrl = urlQueryParams.get(IMPORT_PARAM);
 if (importUrl) {
   fetch(importUrl, (r) => r.text())
-    .then((data) => data.text().then((v) => editor.session.setValue(v)))
+    .then((data) => {
+      data.text().then((v) => editor.session.setValue(v));
+      send();
+    })
     .catch((e) => editor.session.setValue(defaultYML));
 } else {
   editor.session.setValue(defaultYML);
