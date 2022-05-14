@@ -139,8 +139,8 @@ if (importUrl) {
   editor.session.setValue(defaultYML);
 }
 setInterval(() => {
-  if (autoBtn.checked && currentValue !== editor.getValue()) {
+  if (currentValue !== editor.getValue()) {
     currentValue = editor.getValue();
     send();
   }
-}, 2000);
+}, 1500);
