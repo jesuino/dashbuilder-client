@@ -9,4 +9,5 @@ dashbuilder = {
 	// base path to look for dashboards. Default is /
 	path: "/path"
 */
+	mode: "EDITOR"
 };
